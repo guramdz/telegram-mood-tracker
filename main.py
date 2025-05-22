@@ -3,11 +3,17 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import json
 from datetime import datetime, timedelta
 import os
+from dotenv import load_dotenv
+import webbrowser
 
-# Replace this with your actual Telegram bot token
-TOKEN = "7579904171:AAE_Um2Kcc7wmdr5wxD_rqI0NFfOhvcfxYM"
+# 🔐 Load .env token
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
+
+if not TOKEN:
+    raise ValueError("❌ Bot token not found in .env file")
+
 bot = telebot.TeleBot(TOKEN)
-
 DATA_FILE = "mood_data.json"
 
 # Create the data file if it doesn't exist
@@ -57,7 +63,14 @@ def handle_mood_selection(call):
 
     if user_id not in data:
         data[user_id] = {}
+    if today not in data[user_id]:
+        data[user_id][today] = {}
+
+    # Preserve any existing note if it exists
+    existing_note = data[user_id][today].get("note", "")
     data[user_id][today] = {"mood": mood}
+    if existing_note:
+        data[user_id][today]["note"] = existing_note
 
     save_data(data)
     bot.answer_callback_query(call.id, f"Mood saved: {mood}")
@@ -112,13 +125,7 @@ def autotest(user_id):
     except Exception as e:
         print("Auto-test error:", e)
 
-# 🔽 Replace this with your Telegram user ID
+# 🧠 Entry point
 if __name__ == "__main__":
-    import webbrowser
-
-    # Open the bot chat in browser automatically
     webbrowser.open("https://t.me/moodbot_2025_bot")
-
-    # Start polling
     bot.polling()
-

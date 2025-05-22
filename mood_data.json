@@ -3,6 +3,10 @@
         "2025-05-21": {
             "mood": "Good",
             "note": "just a perfect day"
+        },
+        "2025-05-22": {
+            "mood": "Neutral",
+            "note": "nothing"
         }
     }
 }
